@@ -8,6 +8,11 @@ const ACCOUNTS_KEY = "cpgc_attendance_admin_accounts_v1";
 // Leave it empty ("") to keep the app fully local/offline with no sync.
 const GOOGLE_SHEETS_WEBAPP_URL = "";
 
+// Must exactly match SECRET_TOKEN in your Apps Script code — this stops
+// random visitors who find your Web App URL from reading/writing records
+// without going through this app's admin login first.
+const CLOUD_SYNC_TOKEN = "X-HiGKPunwzkDAeVz6MYNLLpzB-Quz97";
+
 function cloudSyncEnabled(){
   return !!GOOGLE_SHEETS_WEBAPP_URL && GOOGLE_SHEETS_WEBAPP_URL.trim() !== "";
 }
@@ -18,7 +23,7 @@ async function cloudSaveRecord(record){
     await fetch(GOOGLE_SHEETS_WEBAPP_URL, {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({ action: "save", record })
+      body: JSON.stringify({ action: "save", record, token: CLOUD_SYNC_TOKEN })
     });
   } catch(e){ /* offline — will just stay local until next successful sync */ }
 }
@@ -29,7 +34,7 @@ async function cloudDeleteRecord(id){
     await fetch(GOOGLE_SHEETS_WEBAPP_URL, {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({ action: "delete", id })
+      body: JSON.stringify({ action: "delete", id, token: CLOUD_SYNC_TOKEN })
     });
   } catch(e){}
 }
@@ -40,7 +45,7 @@ async function cloudDeleteDateKey(dateKey){
     await fetch(GOOGLE_SHEETS_WEBAPP_URL, {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({ action: "deleteByDateKey", dateKey })
+      body: JSON.stringify({ action: "deleteByDateKey", dateKey, token: CLOUD_SYNC_TOKEN })
     });
   } catch(e){}
 }
@@ -48,7 +53,7 @@ async function cloudDeleteDateKey(dateKey){
 async function cloudFetchRecords(){
   if(!cloudSyncEnabled()) return null;
   try {
-    const res = await fetch(GOOGLE_SHEETS_WEBAPP_URL, { method: "GET" });
+    const res = await fetch(GOOGLE_SHEETS_WEBAPP_URL + "?token=" + encodeURIComponent(CLOUD_SYNC_TOKEN), { method: "GET" });
     const data = await res.json();
     if(data && data.ok && Array.isArray(data.records)) return data.records;
   } catch(e){}
