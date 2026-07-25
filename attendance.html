@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cagayan Province Guest Coordinators Attendance</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1f3f83">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+</head>
+<body>
+
+<div class="login-gate" id="loginGate">
+  <div class="login-card">
+    <img class="login-logo" src="logo.jpg" alt="MCGI Guest Coordinators">
+    <h1 class="login-title">Cagayan Province Guest Coordinators</h1>
+    <p class="login-sub">Sign in to continue to Attendance</p>
+    <input type="text" id="adminUsernameInput" placeholder="Username" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false">
+    <div class="password-wrap">
+      <input type="password" id="adminPasswordInput" placeholder="Password" autocomplete="current-password" autocapitalize="none" autocorrect="off" spellcheck="false">
+      <button type="button" class="toggle-pw" id="toggleLoginPw">Show</button>
+    </div>
+    <div class="modal-error" id="loginError">Username or password not recognized.</div>
+    <button class="btn-primary btn-cover" id="submitLoginBtn" style="width:100%;">Sign In</button>
+    <p style="text-align:center; margin-top:14px;">
+      <a href="#" id="resetFromLoginLink" style="font-size:.78rem; color:#8a929b;">Trouble signing in? Reset accounts to default</a>
+    </p>
+  </div>
+</div>
+
+<div class="wrap" id="mainApp" style="display:none;">
+
+  <header>
+    <div style="width:110px;"></div>
+    <div class="titleBlock">
+      <h1>Cagayan Province Guest Coordinators Attendance</h1>
+      <span id="todayDate"></span>
+    </div>
+    <div class="admin-area">
+      <span class="admin-badge" id="adminBadge" title="Click to manage login accounts">
+        <img class="admin-avatar" src="logo.jpg" alt="Admin">
+        <span id="adminBadgeName">Admin</span>
+      </span>
+      <button class="btn-danger btn-small" id="adminLogoutBtn">Logout</button>
+    </div>
+  </header>
+
+  <div class="card">
+    <h2>👥 People</h2>
+    <div class="addRow">
+      <input id="nameInput" type="text" placeholder="Add a name..." maxlength="60">
+      <button class="btn-primary" id="addNameBtn">Add</button>
+    </div>
+    <small class="hint">Names are saved permanently on this device. Choices stay marked as you add more names. Duplicate names aren't allowed.</small>
+  </div>
+
+  <div class="card">
+    <h2>📋 Attendance</h2>
+    <table id="attTable">
+      <thead>
+        <tr>
+          <th><input type="checkbox" id="selectAllCheckbox" title="Select all"></th>
+          <th>Name</th>
+          <th>Duty Status</th>
+          <th>Reason</th>
+          <th>Attendance</th>
+          <th>Zone</th>
+          <th>Gatherings</th>
+          <th>Time</th>
+          <th>Remove</th>
+        </tr>
+      </thead>
+      <tbody id="attBody"></tbody>
+    </table>
+    <p id="noNames" class="empty-note" style="display:none;">No names yet. Add someone above to get started.</p>
+
+    <div class="save-bar">
+      <button class="btn-danger btn-small" id="deleteSelectedBtn" style="display:none;">🗑 Delete Selected</button>
+      <button class="btn-save" id="saveBtn">💾 Save Today's Attendance</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="toggle-records">
+      <h2>🗄️ Saved Records</h2>
+      <button class="btn-ghost btn-small" id="toggleRecordsBtn">Show</button>
+    </div>
+
+    <div id="recordsPanel" style="display:none;">
+      <div style="display:flex; justify-content:flex-end; margin-bottom:10px;">
+        <button class="btn-danger btn-small" id="clearRecordsBtn">Clear All Records</button>
+      </div>
+      <div id="recordsList"></div>
+      <p id="noRecords" class="empty-note" style="display:none;">No saved records yet.</p>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal-overlay" id="manageAccountsModal">
+  <div class="modal-box" style="max-width:400px; position:relative;">
+    <button class="modal-close-x" id="closeAccountsX" title="Close">✕</button>
+    <h3>Manage Admin Accounts</h3>
+    <p>Up to 4 accounts can be authorized to log in as admin. Leave username blank to disable a slot.</p>
+    <div id="accountSlots"></div>
+    <div class="modal-actions" style="justify-content:space-between;">
+      <button class="btn-danger btn-small" id="resetAccountsBtn">Reset to Default</button>
+      <div style="display:flex; gap:8px;">
+        <button class="btn-ghost btn-small" id="cancelAccountsBtn">Cancel</button>
+        <button class="btn-primary btn-small" id="submitAccountsBtn">Save Accounts</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal-box">
+    <h3 id="confirmTitle">Are you sure?</h3>
+    <p id="confirmMessage"></p>
+    <div class="modal-actions">
+      <button class="btn-ghost btn-small" id="confirmCancelBtn">Cancel</button>
+      <button class="btn-danger btn-small" id="confirmOkBtn">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="downloadModal">
+  <div class="modal-box" style="max-width:320px;">
+    <h3>Download Attendance</h3>
+    <p>Choose a format to download.</p>
+    <div class="modal-actions" style="flex-direction:column; gap:8px;">
+      <button class="btn-primary btn-small" id="downloadImageBtn" style="width:100%;">🖼️ Image (JPG)</button>
+      <button class="btn-primary btn-small" id="downloadWordBtn" style="width:100%;">📄 Word Document (.doc)</button>
+      <button class="btn-ghost btn-small" id="cancelDownloadBtn" style="width:100%;">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="editRecordModal">
+  <div class="modal-box" style="max-width:320px;">
+    <h3>Edit Date & Time</h3>
+    <p>Update the day, date, and time for this saved record.</p>
+    <input type="datetime-local" id="editRecordDateTime" style="width:100%; padding:12px 14px; border:1px solid var(--line); border-radius:8px; font-size:.95rem; margin:10px 0;">
+    <div class="modal-actions">
+      <button class="btn-ghost btn-small" id="cancelEditRecordBtn">Cancel</button>
+      <button class="btn-primary btn-small" id="saveEditRecordBtn">Save</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
