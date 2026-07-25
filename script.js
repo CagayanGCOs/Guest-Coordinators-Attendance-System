@@ -3,6 +3,81 @@ const NAMES_KEY = "cpgc_attendance_names_v1";
 const RECORDS_KEY = "cpgc_attendance_records_v1";
 const ACCOUNTS_KEY = "cpgc_attendance_admin_accounts_v1";
 
+/* ============ Google Sheets cloud sync ============ */
+// Paste your deployed Apps Script Web App URL between the quotes below.
+// Leave it empty ("") to keep the app fully local/offline with no sync.
+const GOOGLE_SHEETS_WEBAPP_URL = "";
+
+function cloudSyncEnabled(){
+  return !!GOOGLE_SHEETS_WEBAPP_URL && GOOGLE_SHEETS_WEBAPP_URL.trim() !== "";
+}
+
+async function cloudSaveRecord(record){
+  if(!cloudSyncEnabled()) return;
+  try {
+    await fetch(GOOGLE_SHEETS_WEBAPP_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ action: "save", record })
+    });
+  } catch(e){ /* offline — will just stay local until next successful sync */ }
+}
+
+async function cloudDeleteRecord(id){
+  if(!cloudSyncEnabled()) return;
+  try {
+    await fetch(GOOGLE_SHEETS_WEBAPP_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ action: "delete", id })
+    });
+  } catch(e){}
+}
+
+async function cloudDeleteDateKey(dateKey){
+  if(!cloudSyncEnabled()) return;
+  try {
+    await fetch(GOOGLE_SHEETS_WEBAPP_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ action: "deleteByDateKey", dateKey })
+    });
+  } catch(e){}
+}
+
+async function cloudFetchRecords(){
+  if(!cloudSyncEnabled()) return null;
+  try {
+    const res = await fetch(GOOGLE_SHEETS_WEBAPP_URL, { method: "GET" });
+    const data = await res.json();
+    if(data && data.ok && Array.isArray(data.records)) return data.records;
+  } catch(e){}
+  return null;
+}
+
+// Pulls every record from the Sheet and merges it into local storage
+// (cloud copy wins per record id), then re-renders the list.
+async function syncRecordsFromCloud(showFeedback){
+  if(!cloudSyncEnabled()){
+    if(showFeedback) showToast("Cloud sync isn't set up yet");
+    return;
+  }
+  if(showFeedback) showToast("Syncing from cloud…");
+  const cloudRecords = await cloudFetchRecords();
+  if(cloudRecords === null){
+    if(showFeedback) showToast("Couldn't reach the cloud — check your internet connection");
+    return;
+  }
+  const local = loadRecords();
+  const byId = {};
+  local.forEach(r => { byId[r.id] = r; });
+  cloudRecords.forEach(r => { byId[r.id] = r; }); // cloud is source of truth on conflict
+  const merged = Object.values(byId).sort((a, b) => b.id - a.id);
+  saveRecords(merged);
+  if(isAdmin) renderRecords();
+  if(showFeedback) showToast("Synced " + cloudRecords.length + " record(s) from cloud");
+}
+
 /* ============ Encode helpers (obscure, not real security) ============ */
 function enc(str){ try { return btoa(unescape(encodeURIComponent(str || ""))); } catch(e){ return ""; } }
 function dec(str){ try { return decodeURIComponent(escape(atob(str || ""))); } catch(e){ return ""; } }
@@ -494,8 +569,9 @@ document.getElementById('saveBtn').addEventListener('click', () => {
   const records = loadRecords();
   records.unshift(record);
   saveRecords(records);
+  cloudSaveRecord(record);
 
-  showToast("Attendance saved ✔");
+  showToast(cloudSyncEnabled() ? "Attendance saved ✔ (syncing to cloud…)" : "Attendance saved ✔");
   if(isAdmin) renderRecords();
 });
 
@@ -653,13 +729,23 @@ document.getElementById('toggleRecordsBtn').addEventListener('click', () => {
   const isOpen = panel.style.display === 'block';
   panel.style.display = isOpen ? 'none' : 'block';
   btn.textContent = isOpen ? 'Show' : 'Hide';
-  if(!isOpen) renderRecords();
+  if(!isOpen){
+    renderRecords();
+    if(cloudSyncEnabled()) syncRecordsFromCloud(false);
+  }
+});
+
+document.getElementById('syncCloudBtn').addEventListener('click', () => {
+  if(!isAdmin) return;
+  syncRecordsFromCloud(true);
 });
 
 document.getElementById('clearRecordsBtn').addEventListener('click', () => {
   if(!isAdmin) return;
   showConfirm("Delete ALL saved attendance records? This cannot be undone.", () => {
+    const existing = loadRecords();
     saveRecords([]);
+    existing.forEach(r => cloudDeleteRecord(r.id));
     renderRecords();
     showToast("All records deleted");
   });
@@ -793,6 +879,7 @@ function renderRecords(){
         let records = loadRecords();
         records = records.filter(r => r.id !== id);
         saveRecords(records);
+        cloudDeleteRecord(id);
         renderRecords();
         showToast("Record deleted");
       });
@@ -809,6 +896,7 @@ function renderRecords(){
         let records = loadRecords();
         records = records.filter(r => dateKeyOf(r) !== key);
         saveRecords(records);
+        cloudDeleteDateKey(key);
         renderRecords();
         showToast("Date's records deleted");
       });
@@ -1019,6 +1107,7 @@ document.getElementById('saveEditRecordBtn').addEventListener('click', () => {
     rec.dateKey = localDateKey(newDate);
     rec.dateLabel = formatDateFull(newDate);
     saveRecords(records);
+    cloudSaveRecord(rec);
     renderRecords();
     showToast("Record date & time updated");
   }
