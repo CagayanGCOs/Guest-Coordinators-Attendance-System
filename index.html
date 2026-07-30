@@ -1,161 +1,110 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cagayan Province Guest Coordinators Attendance</title>
-<link rel="stylesheet" href="styles.css">
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#1f3f83">
-<link rel="apple-touch-icon" href="icon-192.png">
-<link rel="icon" href="icon-192.png">
+<title>Prompter // Scroll Deck</title>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#0b0d0c">
+<link rel="icon" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="stylesheet" href="./style.css">
 </head>
 <body>
 
-<div class="login-gate" id="loginGate">
-  <div class="login-card">
-    <img class="login-logo" src="logo.jpg" alt="MCGI Guest Coordinators">
-    <h1 class="login-title">Cagayan Province Guest Coordinators</h1>
-    <p class="login-sub">Sign in to continue to Attendance</p>
-    <input type="text" id="adminUsernameInput" placeholder="Username" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false">
-    <div class="password-wrap">
-      <input type="password" id="adminPasswordInput" placeholder="Password" autocomplete="current-password" autocapitalize="none" autocorrect="off" spellcheck="false">
-      <button type="button" class="toggle-pw" id="toggleLoginPw">Show</button>
-    </div>
-    <div class="modal-error" id="loginError">Username or password not recognized.</div>
-    <button class="btn-primary btn-cover" id="submitLoginBtn" style="width:100%;">Sign In</button>
-    <p style="text-align:center; margin-top:14px;">
-      <a href="#" id="resetFromLoginLink" style="font-size:.78rem; color:#8a929b;">Trouble signing in? Reset accounts to default</a>
-    </p>
-  </div>
-</div>
-
-<div class="wrap" id="mainApp" style="display:none;">
-
-  <header>
-    <div style="width:110px;"></div>
-    <div class="titleBlock">
-      <h1>Cagayan Province Guest Coordinators Attendance</h1>
-      <span id="todayDate"></span>
-    </div>
-    <div class="admin-area">
-      <span class="admin-badge" id="adminBadge" title="Click to manage login accounts">
-        <img class="admin-avatar" src="logo.jpg" alt="Admin">
-        <span id="adminBadgeName">Admin</span>
-      </span>
-      <button class="btn-danger btn-small" id="adminLogoutBtn">Logout</button>
-    </div>
-  </header>
-
-  <div class="card">
-    <h2>👥 People</h2>
-    <div class="addRow">
-      <input id="nameInput" type="text" placeholder="Add a name..." maxlength="60">
-      <button class="btn-primary" id="addNameBtn">Add</button>
-    </div>
-    <small class="hint">Names are saved permanently on this device. Choices stay marked as you add more names. Duplicate names aren't allowed.</small>
-  </div>
-
-  <div class="card">
-    <h2>📋 Attendance</h2>
-    <table id="attTable">
-      <thead>
-        <tr>
-          <th><input type="checkbox" id="selectAllCheckbox" title="Select all"></th>
-          <th>Name</th>
-          <th>Duty Status</th>
-          <th>Reason</th>
-          <th>Attendance</th>
-          <th>Zone</th>
-          <th>Gatherings</th>
-          <th>Time</th>
-          <th>Remove</th>
-        </tr>
-      </thead>
-      <tbody id="attBody"></tbody>
-    </table>
-    <p id="noNames" class="empty-note" style="display:none;">No names yet. Add someone above to get started.</p>
-
-    <div class="save-bar">
-      <button class="btn-danger btn-small" id="deleteSelectedBtn" style="display:none;">🗑 Delete Selected</button>
-      <button class="btn-save" id="saveBtn">💾 Save Today's Attendance</button>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="toggle-records">
-      <h2>🗄️ Saved Records</h2>
-      <button class="btn-ghost btn-small" id="toggleRecordsBtn">Show</button>
-    </div>
-
-    <div id="recordsPanel" style="display:none;">
-      <div style="display:flex; justify-content:flex-end; gap:8px; margin-bottom:10px;">
-        <button class="btn-primary btn-small" id="syncCloudBtn">☁️ Sync from Cloud</button>
-        <button class="btn-danger btn-small" id="clearRecordsBtn">Clear All Records</button>
-      </div>
-      <div id="recordsList"></div>
-      <p id="noRecords" class="empty-note" style="display:none;">No saved records yet.</p>
-    </div>
-  </div>
-
-</div>
-
-<div class="toast" id="toast"></div>
-
-<div class="modal-overlay" id="manageAccountsModal">
-  <div class="modal-box" style="max-width:400px; position:relative;">
-    <button class="modal-close-x" id="closeAccountsX" title="Close">✕</button>
-    <h3>Manage Admin Accounts</h3>
-    <p>Up to 4 accounts can be authorized to log in as admin. Leave username blank to disable a slot.</p>
-    <div id="accountSlots"></div>
-    <div class="modal-actions" style="justify-content:space-between;">
-      <button class="btn-danger btn-small" id="resetAccountsBtn">Reset to Default</button>
-      <div style="display:flex; gap:8px;">
-        <button class="btn-ghost btn-small" id="cancelAccountsBtn">Cancel</button>
-        <button class="btn-primary btn-small" id="submitAccountsBtn">Save Accounts</button>
+<div class="rig">
+  <div class="rack">
+    <div class="brand">
+      <div class="dot"></div>
+      <div>
+        <h1>Prompter Deck</h1>
+        <span>scroll · record · repeat</span>
       </div>
     </div>
-  </div>
-</div>
 
-<div class="modal-overlay" id="confirmModal">
-  <div class="modal-box">
-    <h3 id="confirmTitle">Are you sure?</h3>
-    <p id="confirmMessage"></p>
-    <div class="modal-actions">
-      <button class="btn-ghost btn-small" id="confirmCancelBtn">Cancel</button>
-      <button class="btn-danger btn-small" id="confirmOkBtn">Confirm</button>
+    <div class="field-group">
+      <div class="field-label">Source</div>
+      <div class="tabbar">
+        <button class="tabbtn active" data-tab="text">Text</button>
+        <button class="tabbtn" data-tab="image">Image</button>
+      </div>
+
+      <div id="panel-text">
+        <textarea id="textInput" placeholder="I-type o i-paste ang iyong script dito...">Dayawen taku si Kabunian begew sin Inam-amag na
+(Purihin natin ang Dios dahil sa Kanyang mga likha)
+
+Dayawen! (Purihin)
+Dayawen taku si Kabunian
+(Purihin natin ang Dios)</textarea>
+      </div>
+      <div id="panel-image" style="display:none;">
+        <input type="file" id="imageInput" accept="image/*">
+      </div>
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">Canvas size</div>
+      <select id="resPreset">
+        <option value="1920x1080">1920 × 1080 (Full HD)</option>
+        <option value="1280x720">1280 × 720 (HD)</option>
+        <option value="custom">Custom...</option>
+      </select>
+      <div class="row2" id="customRes" style="display:none;">
+        <input type="number" id="customW" placeholder="Width" value="1080">
+        <input type="number" id="customH" placeholder="Height" value="1920">
+      </div>
+    </div>
+
+    <div class="field-group" id="fontGroup">
+      <div class="field-label">Font size (text mode)</div>
+      <div class="fontrow">
+        <input type="range" id="fontSize" min="20" max="140" value="48">
+        <span class="fontval" id="fontSizeVal">48px</span>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">Speed</div>
+      <div class="speedbar" id="speedBar">
+        <button class="speedbtn" data-speed="0.5">0.5x</button>
+        <button class="speedbtn active" data-speed="1.0">1.0x</button>
+        <button class="speedbtn" data-speed="1.5">1.5x</button>
+        <button class="speedbtn" data-speed="2.0">2.0x</button>
+        <button class="speedbtn" data-speed="3.0">3.0x</button>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">Transport</div>
+      <div class="transport">
+        <button class="btn primary" id="playBtn">▶ Play</button>
+        <button class="btn" id="replayBtn">⟲ Replay</button>
+      </div>
+      <select id="recFps">
+        <option value="24">24 fps — smoother on slow devices</option>
+        <option value="30" selected>30 fps — standard</option>
+      </select>
+      <div class="transport">
+        <button class="btn rec" id="recBtn">● Record screen</button>
+      </div>
+    </div>
+
+    <div class="hint">
+      <b>Replay</b> = babalik sa simula.<br>
+      Recording captures <b>only</b> the prompter canvas — hindi kasama ang mga buttons kahit ano pa mangyari sa screen.
+    </div>
+  </div>
+
+  <div class="stage">
+    <div class="monitor" id="monitor">
+      <canvas id="stageCanvas"></canvas>
+    </div>
+    <div class="scrubwrap">
+      <div class="scrub"><div class="scrub-fill" id="scrubFill"></div></div>
     </div>
   </div>
 </div>
 
-<div class="modal-overlay" id="downloadModal">
-  <div class="modal-box" style="max-width:320px;">
-    <h3>Download Attendance</h3>
-    <p>Choose a format to download.</p>
-    <div class="modal-actions" style="flex-direction:column; gap:8px;">
-      <button class="btn-primary btn-small" id="downloadImageBtn" style="width:100%;">🖼️ Image (JPG)</button>
-      <button class="btn-primary btn-small" id="downloadWordBtn" style="width:100%;">📄 Word Document (.doc)</button>
-      <button class="btn-ghost btn-small" id="cancelDownloadBtn" style="width:100%;">Cancel</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="editRecordModal">
-  <div class="modal-box" style="max-width:320px;">
-    <h3>Edit Date & Time</h3>
-    <p>Update the day, date, and time for this saved record.</p>
-    <input type="datetime-local" id="editRecordDateTime" style="width:100%; padding:12px 14px; border:1px solid var(--line); border-radius:8px; font-size:.95rem; margin:10px 0;">
-    <div class="modal-actions">
-      <button class="btn-ghost btn-small" id="cancelEditRecordBtn">Cancel</button>
-      <button class="btn-primary btn-small" id="saveEditRecordBtn">Save</button>
-    </div>
-  </div>
-</div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-<script src="script.js"></script>
+<script src="./script.js"></script>
 </body>
 </html>

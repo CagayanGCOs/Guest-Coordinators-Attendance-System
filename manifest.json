@@ -1,10 +1,13 @@
 {
-  "name": "Cagayan Province Guest Coordinators Attendance",
-  "short_name": "CPGC Attendance",
-  "start_url": "./attendance.html",
+  "name": "Prompter Deck",
+  "short_name": "Prompter",
+  "description": "Offline scrolling teleprompter for text and images.",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#14294f",
-  "theme_color": "#1f3f83",
+  "orientation": "any",
+  "background_color": "#0b0d0c",
+  "theme_color": "#0b0d0c",
   "icons": [
     { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
